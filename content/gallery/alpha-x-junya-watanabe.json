@@ -1,5 +1,4 @@
 {
-  "password": "",
   "id": "alpha-x-junya-watanabe",
   "title": "ALPHA X JUNYA WATANABE",
   "subTitle": "",
@@ -20,10 +19,10 @@
   ],
   "category": "digital",
   "tags": [
-    "hero",
     "featured",
     "downloadable"
   ],
+  "password": "",
   "imageAspectRatios": [
     1.5,
     1.5,
