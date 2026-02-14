@@ -37,6 +37,20 @@ content:
       - name: coverPhoto
         label: Cover Photo
         type: image
+        description: Main thumbnail for gallery list and fallback for Featured Work
+      - name: featuredImage
+        label: Featured Image
+        type: object
+        description: Separate landscape/portrait images for the Featured Work grid
+        fields:
+          - name: desktop
+            label: Desktop (Landscape)
+            type: image
+            description: Landscape image shown on desktop in Featured Work grid
+          - name: mobile
+            label: Mobile (Portrait)
+            type: image
+            description: Portrait image shown on mobile in Featured Work grid
       - name: imageUrls
         label: Photos
         type: image
@@ -61,30 +75,37 @@ content:
 
   # ─── Home Page ────────────────────────────────────────
   # Matches: Home page → Home/HeroSlideshow, Home/FeaturedWork
-  - name: home-settings
-    label: "Home: Settings"
-    type: file
-    path: content/home/settings.json
-    format: json
-    fields:
-      - name: heroTitle
-        label: Hero Title
-        type: string
-      - name: featuredTitle
-        label: Featured Section Title
-        type: string
-
   - name: home-hero-slideshow
     label: "Home: Hero Slideshow"
     type: file
     path: content/home/hero-slideshow.json
     format: json
     fields:
+      - name: heroTitle
+        label: Hero Title
+        type: string
+        description: Optional title displayed over the hero slideshow
       - name: galleries
         label: Hero Galleries
         type: string
         list: true
         description: Gallery IDs for the hero slideshow (uses cover photo from each gallery)
+
+  - name: home-featured-work
+    label: "Home: Featured Work"
+    type: file
+    path: content/home/featured-work.json
+    format: json
+    fields:
+      - name: title
+        label: Section Title
+        type: string
+        description: Title for the featured work section
+      - name: galleries
+        label: Work
+        type: string
+        list: true
+        description: Gallery IDs to feature (uses featuredImage landscape/portrait or cover photo)
 
   - name: home-quotes
     label: "Home: Quotes"

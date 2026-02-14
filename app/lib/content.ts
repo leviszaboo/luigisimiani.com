@@ -10,8 +10,8 @@ import type { Gallery, DisplaySize } from "@/app/types/content";
 // Organized by page to match frontend component structure
 
 // Home page content (→ Home/HeroSlideshow, Home/FeaturedWork)
-import settingsData from "@/content/home/settings.json";
 import heroSlideshowData from "@/content/home/hero-slideshow.json";
+import featuredWorkData from "@/content/home/featured-work.json";
 import quotesData from "@/content/home/quotes.json";
 
 // About page content (→ AboutMe/ScrollingQuote, AboutMe/FilmStrip)
@@ -62,8 +62,8 @@ const GALLERY_MAP: Record<string, Gallery> = {
 // --- Single-file content registry (keyed by page/component) ---
 const CONTENT_MAP: Record<string, ContentDoc> = {
   // Home page
-  "home/settings": settingsData as unknown as ContentDoc,
   "home/hero-slideshow": heroSlideshowData as unknown as ContentDoc,
+  "home/featured-work": featuredWorkData as unknown as ContentDoc,
   "home/quotes": quotesData as unknown as ContentDoc,
 
   // About page
@@ -233,14 +233,21 @@ export const fetchGalleryById = cache(
 );
 
 /**
- * Fetch featured galleries
+ * Fetch featured galleries (from explicit selection in featured-work.json)
  */
 export const fetchFeaturedGalleries = cache(async (): Promise<Gallery[]> => {
   try {
-    const allGalleries = await fetchGalleries();
-    return allGalleries.filter(
-      (g) => g.featured === true || g.tags?.includes("featured")
-    );
+    const featuredWork = featuredWorkData as { galleries?: string[] };
+    const galleryIds = featuredWork.galleries || [];
+    const galleries: Gallery[] = [];
+
+    for (const id of galleryIds) {
+      if (GALLERY_MAP[id]) {
+        galleries.push({ ...GALLERY_MAP[id], id });
+      }
+    }
+
+    return galleries;
   } catch (error) {
     console.error("Error fetching featured galleries:", error);
     return [];
@@ -286,22 +293,14 @@ export function computeDisplaySize(gallery: Gallery): DisplaySize {
 
 /**
  * Fetch featured galleries with computed display sizes
+ * Uses explicit gallery selections from home/featured-work.json
  */
 export const fetchFeaturedGalleriesWithLayout = cache(
   async (): Promise<Gallery[]> => {
     try {
-      const allGalleries = await fetchGalleries();
-      const featured = allGalleries.filter(
-        (g) => g.featured === true || g.tags?.includes("featured")
-      );
+      const featured = await fetchFeaturedGalleries();
 
-      const sorted = featured.sort((a, b) => {
-        const dateA = a.date ? new Date(a.date).getTime() : 0;
-        const dateB = b.date ? new Date(b.date).getTime() : 0;
-        return dateB - dateA;
-      });
-
-      return sorted.map((gallery) => ({
+      return featured.map((gallery) => ({
         ...gallery,
         displaySize: computeDisplaySize(gallery),
       }));

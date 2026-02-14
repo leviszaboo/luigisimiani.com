@@ -17,40 +17,77 @@ function hasTag(gallery, tag) {
   return normalized.includes(tag.toLowerCase());
 }
 
-// Generate deterministic vertical offset for staggered look
-function getVerticalOffset(id, index) {
-  const hash = id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const seed = (hash + index) % 100;
-  return [0, 80, 40, 120, 20, 100, 60, 140][seed % 8];
+/**
+ * Get the featured image for a gallery by variant.
+ * Desktop: landscape (featuredImage.desktop → coverPhoto → first image)
+ * Mobile: portrait (featuredImage.mobile → coverPhoto → first image)
+ */
+function getFeaturedImage(gallery, variant) {
+  if (variant === "desktop") {
+    return (
+      gallery.featuredImage?.desktop ||
+      gallery.coverPhoto ||
+      gallery.imageUrls?.[0]
+    );
+  }
+  return (
+    gallery.featuredImage?.mobile ||
+    gallery.coverPhoto ||
+    gallery.imageUrls?.[0]
+  );
 }
 
-export default function FeaturedWork({ galleries, quotes = [] }) {
+/**
+ * Get column span class based on display size (6-column grid)
+ */
+function getColSpan(gallery) {
+  const size = gallery.displaySize;
+  if (hasTag(gallery, "hero") || size === "full") return "md:col-span-6";
+  if (size === "third") return "md:col-span-2";
+  return "md:col-span-3"; // half (default)
+}
+
+/**
+ * Get aspect ratio classes based on display size.
+ * Desktop: landscape ratios. Mobile: portrait when separate image exists.
+ */
+function getDesktopAspect(gallery) {
+  const size = gallery.displaySize;
+  if (hasTag(gallery, "hero") || size === "full") return "aspect-[21/9]";
+  if (size === "third") return "aspect-[4/5]";
+  return "aspect-[3/2]";
+}
+
+export default function FeaturedWork({
+  galleries,
+  quotes = [],
+  title = "Featured Work",
+}) {
   const { isMenuVisible } = useMenuStore();
 
-  // Combine galleries and quotes into a single feed
+  // Build feed: galleries with interspersed quotes
   const feedItems = useMemo(() => {
+    if (!galleries?.length) return [];
+
     const items = [];
+    let quoteIndex = 0;
 
-    // Add galleries as gallery type
-    galleries?.forEach((g, i) => {
-      items.push({ type: "gallery", data: g, order: i });
+    galleries.forEach((g, i) => {
+      items.push({ type: "gallery", data: g });
+
+      // Insert a quote after every 2nd gallery if quotes remain
+      if (
+        quotes.length > 0 &&
+        (i + 1) % 2 === 0 &&
+        quoteIndex < quotes.length
+      ) {
+        items.push({ type: "quote", data: quotes[quoteIndex] });
+        quoteIndex++;
+      }
     });
 
-    // Add quotes interspersed
-    quotes?.forEach((q, i) => {
-      items.push({ type: "quote", data: q, order: i + 0.5 });
-    });
-
-    // Sort by order to intersperse
-    return items.sort((a, b) => a.order - b.order);
+    return items;
   }, [galleries, quotes]);
-
-  // Memoize vertical offsets
-  const verticalOffsets = useMemo(() => {
-    return feedItems.map((item, i) =>
-      getVerticalOffset(item.data.id || `quote-${i}`, i)
-    );
-  }, [feedItems]);
 
   if (feedItems.length === 0) return null;
 
@@ -65,34 +102,32 @@ export default function FeaturedWork({ galleries, quotes = [] }) {
         >
           {/* Section header */}
           <motion.header
-            className="max-w-6xl mx-auto mb-24"
+            className="max-w-7xl mx-auto mb-16"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
             <h2 className="retro text-lg uppercase tracking-widest">
-              Featured Work
+              {title}
             </h2>
           </motion.header>
 
-          {/* Two-column grid feed */}
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12">
+          {/* Portfolio grid — 6-column system */}
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-6">
             {feedItems.map((item, index) => {
-              const verticalOffset = verticalOffsets[index];
-
               if (item.type === "quote") {
                 return (
                   <motion.blockquote
                     key={`quote-${index}`}
-                    className="col-span-1 md:col-span-2 py-[25vh]"
+                    className="col-span-1 md:col-span-6 py-16 md:py-24"
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 0.8 }}
                   >
                     <p className="text-2xl md:text-4xl lg:text-5xl font-light leading-relaxed text-white/90 max-w-4xl">
-                      "{item.data.text}"
+                      &ldquo;{item.data.text}&rdquo;
                     </p>
                     {item.data.author && (
                       <cite className="block mt-8 retro text-xs uppercase tracking-widest text-white/50 not-italic">
@@ -104,45 +139,86 @@ export default function FeaturedWork({ galleries, quotes = [] }) {
               }
 
               const gallery = item.data;
-              const isHero = hasTag(gallery, "hero");
+              const colSpan = getColSpan(gallery);
+              const desktopAspect = getDesktopAspect(gallery);
+              const isFullWidth =
+                hasTag(gallery, "hero") || gallery.displaySize === "full";
+
+              const desktopSrc = getFeaturedImage(gallery, "desktop");
+              const mobileSrc = getFeaturedImage(gallery, "mobile");
+              const hasMobileVariant =
+                gallery.featuredImage?.mobile &&
+                gallery.featuredImage.mobile !== desktopSrc;
 
               return (
                 <motion.article
                   key={gallery.id}
-                  className={`relative mb-[40vh] ${isHero ? "col-span-1 md:col-span-2" : ""}`}
-                  style={{ marginTop: isHero ? 0 : verticalOffset }}
-                  initial={{ opacity: 0, y: 60 }}
+                  className={`relative col-span-1 ${colSpan}`}
+                  initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.6, delay: (index % 3) * 0.1 }}
                 >
                   <Link href={`/gallery/${gallery.id}`} className="block group">
-                    {/* Image with natural aspect ratio */}
-                    <div className="relative overflow-hidden">
+                    {/* Desktop: landscape featured image */}
+                    <div
+                      className={`relative overflow-hidden ${desktopAspect} ${hasMobileVariant ? "hidden md:block" : ""}`}
+                    >
                       <Image
-                        src={gallery.coverPhoto || gallery.imageUrls[0]}
+                        src={desktopSrc}
                         alt={gallery.title}
-                        width={0}
-                        height={0}
-                        sizes={isHero ? "100vw" : "(max-width: 768px) 100vw, 50vw"}
-                        className="w-full h-auto transition-transform duration-700 group-hover:scale-[1.02]"
+                        fill
+                        sizes={
+                          isFullWidth
+                            ? "100vw"
+                            : gallery.displaySize === "third"
+                              ? "(max-width: 768px) 100vw, 33vw"
+                              : "(max-width: 768px) 100vw, 50vw"
+                        }
+                        className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                       />
 
-                      {/* Gradient overlay for text */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      {/* Gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
 
-                      {/* Title on image */}
-                      <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-                        <h3 className="text-base md:text-xl uppercase tracking-wider text-white mb-1">
+                      {/* Title overlay */}
+                      <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
+                        <h3 className="text-sm md:text-base uppercase tracking-wider text-white">
                           {gallery.title}
                         </h3>
                         {gallery.subTitle && (
-                          <p className="text-xs md:text-sm text-white/60">
+                          <p className="text-xs text-white/60 mt-1">
                             {gallery.subTitle}
                           </p>
                         )}
                       </div>
                     </div>
+
+                    {/* Mobile: portrait featured image (only when a separate mobile image is set) */}
+                    {hasMobileVariant && (
+                      <div className="relative overflow-hidden aspect-[3/4] md:hidden">
+                        <Image
+                          src={mobileSrc}
+                          alt={gallery.title}
+                          fill
+                          sizes="100vw"
+                          className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                        />
+
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+
+                        <div className="absolute bottom-0 left-0 right-0 p-5">
+                          <h3 className="text-sm uppercase tracking-wider text-white">
+                            {gallery.title}
+                          </h3>
+                          {gallery.subTitle && (
+                            <p className="text-xs text-white/60 mt-1">
+                              {gallery.subTitle}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </Link>
                 </motion.article>
               );
@@ -151,7 +227,7 @@ export default function FeaturedWork({ galleries, quotes = [] }) {
 
           {/* View all link */}
           <motion.div
-            className="max-w-6xl mx-auto mt-32 text-center"
+            className="max-w-7xl mx-auto mt-24 text-center"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}

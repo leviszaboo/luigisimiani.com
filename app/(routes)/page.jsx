@@ -11,12 +11,13 @@ import {
 export const revalidate = 3600;
 
 export default async function Home() {
-  const featured = await fetchDoc("home/hero-slideshow");
+  const heroData = await fetchDoc("home/hero-slideshow");
+  const featuredWorkData = await fetchDoc("home/featured-work");
   const quotesData = await fetchDoc("home/quotes");
   const featuredGalleries = await fetchFeaturedGalleriesWithLayout();
 
   // Get hero images from gallery references
-  const galleryIds = featured.galleries || [];
+  const galleryIds = heroData.galleries || [];
   const heroImages = [];
 
   for (const id of galleryIds) {
@@ -29,15 +30,21 @@ export default async function Home() {
     }
   }
 
-  // Get quotes
+  // Get quotes and featured work title
   const quotes = quotesData.quotes || [];
+  const heroTitle = heroData.heroTitle || "";
+  const featuredTitle = featuredWorkData.title || "Featured Work";
 
   return (
     <>
       <Menu />
-      <HeroSlideshow images={heroImages} />
+      <HeroSlideshow images={heroImages} heroTitle={heroTitle} />
       <HomeFlowers />
-      <FeaturedWork galleries={featuredGalleries} quotes={quotes} />
+      <FeaturedWork
+        galleries={featuredGalleries}
+        quotes={quotes}
+        title={featuredTitle}
+      />
     </>
   );
 }
