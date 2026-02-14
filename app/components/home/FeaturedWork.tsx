@@ -38,13 +38,13 @@ function hasTag(gallery: Gallery, tag: string): boolean {
 function getFeaturedImage(gallery: Gallery, variant: "desktop" | "mobile"): string | undefined {
   if (variant === "desktop") {
     return (
-      (gallery as any).featuredImage?.desktop ||
+      gallery.featuredImage?.desktop ||
       gallery.coverPhoto ||
       gallery.imageUrls?.[0]
     );
   }
   return (
-    (gallery as any).featuredImage?.mobile ||
+    gallery.featuredImage?.mobile ||
     gallery.coverPhoto ||
     gallery.imageUrls?.[0]
   );
@@ -160,8 +160,8 @@ export default function FeaturedWork({ galleries, quotes = [], title = "Featured
               const desktopSrc = getFeaturedImage(gallery, "desktop");
               const mobileSrc = getFeaturedImage(gallery, "mobile");
               const hasMobileVariant =
-                (gallery as any).featuredImage?.mobile &&
-                (gallery as any).featuredImage.mobile !== desktopSrc;
+                gallery.featuredImage?.mobile &&
+                gallery.featuredImage.mobile !== desktopSrc;
 
               return (
                 <motion.article

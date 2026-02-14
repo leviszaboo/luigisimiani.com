@@ -89,9 +89,9 @@ export const fetchDocs = cache(async (ref: string): Promise<ContentDoc[]> => {
     const singleFile = CONTENT_MAP[ref] as ContentDoc | ContentDoc[] | undefined;
     if (singleFile) {
       if (Array.isArray(singleFile)) return singleFile;
-      if ((singleFile as any).items) return (singleFile as any).items as ContentDoc[];
-      if ((singleFile as any).images) return (singleFile as any).images as ContentDoc[];
-      if ((singleFile as any).paragraphs) return (singleFile as any).paragraphs as ContentDoc[];
+      if (singleFile.items) return singleFile.items as ContentDoc[];
+      if (singleFile.images) return singleFile.images as ContentDoc[];
+      if (singleFile.paragraphs) return singleFile.paragraphs as ContentDoc[];
       return [singleFile];
     }
 
@@ -99,8 +99,8 @@ export const fetchDocs = cache(async (ref: string): Promise<ContentDoc[]> => {
     if (ref === "gallery") {
       return Object.entries(GALLERY_MAP).map(([id, g]) => ({ ...g, id } as unknown as ContentDoc))
         .sort((a, b) => {
-          const dateA = (a as any).date ? new Date((a as any).date).getTime() : 0;
-          const dateB = (b as any).date ? new Date((b as any).date).getTime() : 0;
+          const dateA = a.date ? new Date(a.date as string).getTime() : 0;
+          const dateB = b.date ? new Date(b.date as string).getTime() : 0;
           return dateB - dateA;
         });
     }
