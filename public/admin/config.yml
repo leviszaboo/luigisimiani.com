@@ -12,7 +12,9 @@ public_folder: /images/galleries
 publish_mode: editorial_workflow
 
 collections:
-  # Galleries
+  # ─── Galleries ────────────────────────────────────────
+  # Matches: Gallery page (gallery/page.tsx) + Gallery detail ([id]/page.tsx)
+  # Components: Gallery/GalleryGrid, Gallery/GalleryView
   - name: galleries
     label: Galleries
     folder: content/gallery
@@ -43,7 +45,23 @@ collections:
         label: Cover Photo
         widget: image
         required: false
-        hint: "Main thumbnail for gallery list"
+        hint: "Main thumbnail for gallery list and fallback for Featured Work"
+      - name: featuredImage
+        label: Featured Image
+        widget: object
+        required: false
+        hint: "Separate landscape/portrait images for the Featured Work grid on the homepage"
+        fields:
+          - name: desktop
+            label: Desktop (Landscape)
+            widget: image
+            required: false
+            hint: "Landscape image shown on desktop in Featured Work grid"
+          - name: mobile
+            label: Mobile (Portrait)
+            widget: image
+            required: false
+            hint: "Portrait image shown on mobile in Featured Work grid"
       - name: imageUrls
         label: Images
         widget: list
@@ -66,45 +84,78 @@ collections:
         required: false
         hint: "Leave blank for public, set password to protect"
 
-  # Pages
-  - name: pages
-    label: Pages
+  # ─── Home Page ────────────────────────────────────────
+  # Matches: Home page (page.jsx)
+  # Components: Home/HeroSlideshow, Home/FeaturedWork
+  - name: home
+    label: Home
     files:
-      - name: homepage
-        label: Homepage
-        file: content/settings.json
+      - name: hero-slideshow
+        label: Hero Slideshow
+        file: content/home/hero-slideshow.json
         fields:
           - name: heroTitle
             label: Hero Title
             widget: string
             required: false
-            hint: "Optional title displayed over hero slideshow"
-          - name: featuredTitle
-            label: Featured Section Title
+            hint: "Optional title displayed over the hero slideshow"
+          - name: galleries
+            label: Hero Galleries
+            widget: list
+            hint: "Select galleries for the hero slideshow. Uses cover photo from each gallery."
+            field:
+              name: galleryId
+              label: Gallery
+              widget: relation
+              collection: galleries
+              search_fields: [title, id]
+              value_field: id
+              display_fields: [title]
+
+      - name: featured-work
+        label: Featured Work
+        file: content/home/featured-work.json
+        fields:
+          - name: title
+            label: Section Title
             widget: string
             default: "Featured Work"
             hint: "Title for the featured work section"
-          - name: heroSlideshow
-            label: Hero Slideshow
-            widget: relation
-            collection: components
-            file: hero
-            value_field: galleries
-            display_fields: ["galleries"]
-            required: false
-            hint: "Reference to Hero Slideshow component"
+          - name: galleries
+            label: Work
+            widget: list
+            hint: "Select galleries to feature. Uses featuredImage (landscape/portrait) or cover photo."
+            field:
+              name: galleryId
+              label: Gallery
+              widget: relation
+              collection: galleries
+              search_fields: [title, id]
+              value_field: id
+              display_fields: [title]
+
+      - name: quotes
+        label: Quotes
+        file: content/home/quotes.json
+        fields:
           - name: quotes
             label: Quotes
-            widget: relation
-            collection: components
-            file: quotes
-            value_field: quotes
-            display_fields: ["quotes"]
-            required: false
-            hint: "Reference to Quotes component"
-      - name: about
-        label: About
-        file: content/bio.json
+            widget: list
+            hint: "Quotes displayed between featured galleries"
+            fields:
+              - { name: id, label: ID, widget: string }
+              - { name: text, label: Quote Text, widget: text }
+              - { name: author, label: Author, widget: string, required: false }
+
+  # ─── About Page ───────────────────────────────────────
+  # Matches: About Me page (about-me/page.jsx)
+  # Components: AboutMe/ScrollingQuote, AboutMe/FilmStrip, AboutMe/HeroSection
+  - name: about
+    label: About
+    files:
+      - name: bio
+        label: Bio
+        file: content/about/bio.json
         fields:
           - name: paragraphs
             label: Paragraphs
@@ -118,9 +169,40 @@ collections:
               - name: value
                 label: Text
                 widget: text
-      - name: contact
-        label: Contact
-        file: content/contact.json
+
+      - name: film-strip
+        label: Film Strip
+        file: content/about/film-strip.json
+        fields:
+          - name: images
+            label: Images
+            widget: list
+            hint: "Film strip images displayed in the hero section of the About page"
+            fields:
+              - name: url
+                label: Image
+                widget: image
+              - name: orientation
+                label: Orientation
+                widget: select
+                options: ["vertical", "horizontal"]
+              - name: aspectRatio
+                label: Aspect Ratio
+                widget: number
+                value_type: float
+                min: 0.1
+                max: 10
+                hint: "Width divided by height (e.g. 0.67 for portrait, 1.5 for landscape)"
+
+  # ─── Contact Page ─────────────────────────────────────
+  # Matches: Contact page (contact/page.jsx)
+  # Components: Contact/ContactPage, Contact/InfoBox
+  - name: contact
+    label: Contact
+    files:
+      - name: contact-info
+        label: Contact Info
+        file: content/contact/contact.json
         fields:
           - name: email
             label: Email
@@ -138,35 +220,3 @@ collections:
             widget: string
             required: false
             hint: "Full LinkedIn profile URL"
-  # Components
-  - name: components
-    label: Components
-    files:
-      - name: hero
-        label: Hero Slideshow
-        file: content/featured.json
-        fields:
-          - name: galleries
-            label: Hero Galleries
-            widget: list
-            hint: "Select galleries for the hero slideshow. Uses cover photo from each gallery."
-            field:
-              name: galleryId
-              label: Gallery
-              widget: relation
-              collection: galleries
-              search_fields: [title, id]
-              value_field: id
-              display_fields: [title]
-      - name: quotes
-        label: Quotes
-        file: content/quotes.json
-        fields:
-          - name: quotes
-            label: Quotes
-            widget: list
-            hint: "Quotes displayed between featured galleries"
-            fields:
-              - { name: id, label: ID, widget: string }
-              - { name: text, label: Quote Text, widget: text }
-              - { name: author, label: Author, widget: string, required: false }

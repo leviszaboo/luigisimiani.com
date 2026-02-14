@@ -14,9 +14,10 @@ interface HeroImage {
 
 interface HeroSlideshowProps {
   images: HeroImage[];
+  heroTitle?: string;
 }
 
-export default function HeroSlideshow({ images }: HeroSlideshowProps) {
+export default function HeroSlideshow({ images, heroTitle }: HeroSlideshowProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { isMenuVisible } = useUI();
 
@@ -71,6 +72,18 @@ export default function HeroSlideshow({ images }: HeroSlideshowProps) {
               <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
             </motion.div>
           </AnimatePresence>
+
+          {/* Hero title */}
+          {heroTitle && (
+            <motion.h1
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 text-3xl md:text-5xl lg:text-6xl text-white text-center font-light tracking-wider"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+            >
+              {heroTitle}
+            </motion.h1>
+          )}
 
           {/* Slide indicators */}
           {images.length > 1 && (

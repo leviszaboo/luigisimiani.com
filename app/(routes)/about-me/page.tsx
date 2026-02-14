@@ -30,8 +30,8 @@ interface Source {
 }
 
 export default async function AboutMe() {
-  const paragraphs = (await fetchDocs("bio")) as unknown as Paragraph[];
-  const sources = (await fetchDocs("film-strip")) as unknown as Source[];
+  const paragraphs = (await fetchDocs("about/bio")) as unknown as Paragraph[];
+  const sources = (await fetchDocs("about/film-strip")) as unknown as Source[];
 
   const blurData = await fetchFeaturedBlurDataUrls(sources);
 

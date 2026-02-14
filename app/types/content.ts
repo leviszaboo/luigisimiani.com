@@ -56,6 +56,10 @@ export interface Gallery {
   category?: string | string[];
   tags?: string[];
   coverPhoto?: string;
+  featuredImage?: {
+    desktop?: string; // landscape image for desktop (Featured Work grid)
+    mobile?: string; // portrait image for mobile (Featured Work grid)
+  };
   imageUrls: string[];
   imageAspectRatios?: number[];
   featured?: boolean;

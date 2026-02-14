@@ -6,7 +6,7 @@ export interface GalleryRow {
 }
 
 /**
- * Get the "weight" of a display size for row calculation
+ * Get the "weight" of a display size for row calculation.
  * Full = 6, Half = 3, Third = 2 (based on 6-column grid)
  */
 function getDisplayWeight(size: DisplaySize): number {
@@ -39,8 +39,24 @@ export function getColSpanClass(size: DisplaySize): string {
 }
 
 /**
- * Group galleries into rows based on their display sizes
- * Each row can hold up to 6 "weight" units
+ * Get the desktop aspect ratio class for a display size.
+ * Full-width: cinematic 21:9, Half: landscape 3:2, Third: portrait 4:5
+ */
+export function getAspectClass(size: DisplaySize): string {
+  switch (size) {
+    case "full":
+      return "aspect-[21/9]";
+    case "third":
+      return "aspect-[4/5]";
+    case "half":
+    default:
+      return "aspect-[3/2]";
+  }
+}
+
+/**
+ * Group galleries into rows based on their display sizes.
+ * Each row can hold up to 6 "weight" units.
  */
 export function groupIntoRows(galleries: Gallery[]): GalleryRow[] {
   const rows: GalleryRow[] = [];
@@ -52,11 +68,10 @@ export function groupIntoRows(galleries: Gallery[]): GalleryRow[] {
     const size = gallery.displaySize || "half";
     const weight = getDisplayWeight(size);
 
-    // If adding this item would exceed row capacity, start a new row
     if (currentWeight + weight > maxWeight && currentRow.length > 0) {
       rows.push({
         items: currentRow,
-        gridClass: getRowGridClass(currentRow),
+        gridClass: "grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-6",
       });
       currentRow = [];
       currentWeight = 0;
@@ -65,32 +80,22 @@ export function groupIntoRows(galleries: Gallery[]): GalleryRow[] {
     currentRow.push(gallery);
     currentWeight += weight;
 
-    // If we've filled exactly 6 units, complete the row
     if (currentWeight === maxWeight) {
       rows.push({
         items: currentRow,
-        gridClass: getRowGridClass(currentRow),
+        gridClass: "grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-6",
       });
       currentRow = [];
       currentWeight = 0;
     }
   }
 
-  // Don't forget the last partial row
   if (currentRow.length > 0) {
     rows.push({
       items: currentRow,
-      gridClass: getRowGridClass(currentRow),
+      gridClass: "grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-6",
     });
   }
 
   return rows;
-}
-
-/**
- * Get the appropriate grid class for a row based on its items
- */
-function getRowGridClass(_items: Gallery[]): string {
-  // Base grid - 6 columns on md+
-  return "grid grid-cols-1 md:grid-cols-6 gap-4";
 }
