@@ -11,8 +11,8 @@ import {
 export const revalidate = 3600;
 
 export default async function Home() {
-  const featured = await fetchDoc("featured");
-  const quotesData = await fetchDoc("quotes");
+  const featured = await fetchDoc("home/hero-slideshow");
+  const quotesData = await fetchDoc("home/quotes");
   const featuredGalleries = await fetchFeaturedGalleriesWithLayout();
 
   // Get hero images from gallery references

@@ -1,6 +1,7 @@
 # .pages.yml — leme media PagesCMS config for luigisimiani.com
 # Docs: https://pagescms.org/docs/configuration
 # Managed by: leme media
+# Structure: organized by page to match frontend components
 
 media:
   - name: images
@@ -10,38 +11,8 @@ media:
     categories: [ image ]
 
 content:
-  - name: settings
-    label: Site Settings
-    type: file
-    path: content/settings.json
-    format: json
-    fields:
-      - name: heroTitle
-        label: Hero Title
-        type: string
-      - name: featuredTitle
-        label: Featured Section Title
-        type: string
-
-  - name: bio
-    label: Bio
-    type: file
-    path: content/bio.json
-    format: json
-    fields:
-      - name: paragraphs
-        label: Paragraphs
-        type: object
-        list: true
-        fields:
-          - name: id
-            label: ID
-            type: string
-            hidden: true
-          - name: value
-            label: Text
-            type: text
-
+  # ─── Galleries ────────────────────────────────────────
+  # Matches: Gallery page + Gallery detail page
   - name: galleries
     label: Galleries
     type: collection
@@ -70,6 +41,13 @@ content:
         label: Photos
         type: image
         list: true
+      - name: category
+        label: Category
+        type: string
+      - name: tags
+        label: Tags
+        type: string
+        list: true
       - name: password
         label: Password
         type: string
@@ -81,38 +59,37 @@ content:
         sort: date
         order: desc
 
-  - name: featured
-    label: Featured
+  # ─── Home Page ────────────────────────────────────────
+  # Matches: Home page → Home/HeroSlideshow, Home/FeaturedWork
+  - name: home-settings
+    label: "Home: Settings"
     type: file
-    path: content/featured.json
+    path: content/home/settings.json
+    format: json
+    fields:
+      - name: heroTitle
+        label: Hero Title
+        type: string
+      - name: featuredTitle
+        label: Featured Section Title
+        type: string
+
+  - name: home-hero-slideshow
+    label: "Home: Hero Slideshow"
+    type: file
+    path: content/home/hero-slideshow.json
     format: json
     fields:
       - name: galleries
-        label: Featured Galleries
+        label: Hero Galleries
         type: string
         list: true
-        description: Gallery IDs to feature on the homepage
+        description: Gallery IDs for the hero slideshow (uses cover photo from each gallery)
 
-  - name: contact
-    label: Contact
+  - name: home-quotes
+    label: "Home: Quotes"
     type: file
-    path: content/contact.json
-    format: json
-    fields:
-      - name: email
-        label: Email
-        type: string
-      - name: instagram
-        label: Instagram
-        type: string
-      - name: phone
-        label: Phone
-        type: string
-
-  - name: quotes
-    label: Quotes
-    type: file
-    path: content/quotes.json
+    path: content/home/quotes.json
     format: json
     fields:
       - name: quotes
@@ -120,12 +97,79 @@ content:
         type: object
         list: true
         fields:
+          - name: id
+            label: ID
+            type: string
+            hidden: true
           - name: text
             label: Quote
             type: text
           - name: author
             label: Author
             type: string
+
+  # ─── About Page ───────────────────────────────────────
+  # Matches: About Me page → AboutMe/ScrollingQuote, AboutMe/FilmStrip
+  - name: about-bio
+    label: "About: Bio"
+    type: file
+    path: content/about/bio.json
+    format: json
+    fields:
+      - name: paragraphs
+        label: Paragraphs
+        type: object
+        list: true
+        fields:
+          - name: id
+            label: ID
+            type: string
+            hidden: true
+          - name: value
+            label: Text
+            type: text
+
+  - name: about-film-strip
+    label: "About: Film Strip"
+    type: file
+    path: content/about/film-strip.json
+    format: json
+    fields:
+      - name: images
+        label: Images
+        type: object
+        list: true
+        fields:
+          - name: url
+            label: Image
+            type: image
+          - name: orientation
+            label: Orientation
+            type: string
+          - name: aspectRatio
+            label: Aspect Ratio
+            type: number
+
+  # ─── Contact Page ─────────────────────────────────────
+  # Matches: Contact page → Contact/ContactPage, Contact/InfoBox
+  - name: contact
+    label: "Contact: Info"
+    type: file
+    path: content/contact/contact.json
+    format: json
+    fields:
+      - name: email
+        label: Email
+        type: string
+      - name: location
+        label: Location
+        type: string
+      - name: instagram
+        label: Instagram
+        type: string
+      - name: linkedin
+        label: LinkedIn
+        type: string
 
 settings:
   content:

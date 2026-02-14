@@ -20,8 +20,8 @@ export const metadata = {
 };
 
 export default async function AboutMe() {
-  const paragraphs = await fetchDocs("bio");
-  const sources = await fetchDocs("film-strip");
+  const paragraphs = await fetchDocs("about/bio");
+  const sources = await fetchDocs("about/film-strip");
 
   const blurData = await fetchFeaturedBlurDataUrls(sources);
 

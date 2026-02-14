@@ -7,12 +7,19 @@ import { cache } from "react";
 import type { Gallery, DisplaySize } from "@/app/types/content";
 
 // --- Static imports: bundled at build time ---
-import bioData from "@/content/bio.json";
-import contactData from "@/content/contact.json";
-import featuredData from "@/content/featured.json";
-import filmStripData from "@/content/film-strip.json";
-import quotesData from "@/content/quotes.json";
-import settingsData from "@/content/settings.json";
+// Organized by page to match frontend component structure
+
+// Home page content (→ Home/HeroSlideshow, Home/FeaturedWork)
+import settingsData from "@/content/home/settings.json";
+import heroSlideshowData from "@/content/home/hero-slideshow.json";
+import quotesData from "@/content/home/quotes.json";
+
+// About page content (→ AboutMe/ScrollingQuote, AboutMe/FilmStrip)
+import bioData from "@/content/about/bio.json";
+import filmStripData from "@/content/about/film-strip.json";
+
+// Contact page content (→ Contact/ContactPage)
+import contactData from "@/content/contact/contact.json";
 
 // Gallery imports
 import alphaXJunyaWatanabe from "@/content/gallery/alpha-x-junya-watanabe.json";
@@ -52,14 +59,19 @@ const GALLERY_MAP: Record<string, Gallery> = {
   "wingstop-x-smib": wingstopXSmib as unknown as Gallery,
 };
 
-// --- Single-file content registry ---
+// --- Single-file content registry (keyed by page/component) ---
 const CONTENT_MAP: Record<string, ContentDoc> = {
-  bio: bioData as unknown as ContentDoc,
-  contact: contactData as unknown as ContentDoc,
-  featured: featuredData as unknown as ContentDoc,
-  "film-strip": filmStripData as unknown as ContentDoc,
-  quotes: quotesData as unknown as ContentDoc,
-  settings: settingsData as unknown as ContentDoc,
+  // Home page
+  "home/settings": settingsData as unknown as ContentDoc,
+  "home/hero-slideshow": heroSlideshowData as unknown as ContentDoc,
+  "home/quotes": quotesData as unknown as ContentDoc,
+
+  // About page
+  "about/bio": bioData as unknown as ContentDoc,
+  "about/film-strip": filmStripData as unknown as ContentDoc,
+
+  // Contact page
+  "contact": contactData as unknown as ContentDoc,
 };
 
 /**
