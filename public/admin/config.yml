@@ -1,14 +1,16 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+
 backend:
   name: github
   repo: leme-leme/luigisimiani
-  branch: cms/sveltia
+  branch: main
   base_url: https://sveltia-cms-auth.leme.workers.dev
   auth_endpoint: /
 
 media_folder: public/images
 public_folder: /images
 
-site_url: https://luigisimiani.vercel.app
+site_url: https://luigisimiani.com
 
 collections:
   - name: home
@@ -65,6 +67,30 @@ collections:
           - { name: instagram, label: Instagram, widget: string }
           - { name: linkedin, label: LinkedIn, widget: string }
 
+  - name: settings
+    label: Settings
+    files:
+      - name: settings
+        label: Site Settings
+        file: content/settings.json
+        format: json
+        fields:
+          - { name: heroTitle, label: Hero Title, widget: string, required: false }
+          - { name: featuredTitle, label: Featured Section Title, widget: string }
+
+  - name: featured
+    label: Featured
+    files:
+      - name: featured
+        label: Featured Work
+        file: content/featured.json
+        format: json
+        fields:
+          - name: galleries
+            label: Featured Gallery Slugs
+            widget: list
+            field: { name: slug, label: Gallery Slug, widget: string }
+
   - name: gallery
     label: Gallery
     label_singular: Project
@@ -73,8 +99,8 @@ collections:
     create: true
     slug: "{{fields.id}}"
     identifier_field: id
-    summary: "{{title}}"
-    sortable_fields: [title, date]
+    summary: "{{title}} ({{visibility}})"
+    sortable_fields: [title, date, visibility]
     fields:
       - { name: id, label: Slug, widget: string }
       - { name: title, label: Title, widget: string }
@@ -85,11 +111,13 @@ collections:
         options: ["public", "password", "hidden"]
         default: "public"
       - { name: password, label: Password, widget: string, required: false, hint: "Only when visibility is 'password'" }
+      - { name: featured, label: Featured, widget: boolean, required: false, default: false }
+      - { name: category, label: Category, widget: string, required: false }
       - name: tags
         label: Tags
         widget: list
         field: { name: tag, label: Tag, widget: string }
-        hint: "e.g. featured, homepage, editorial, portrait"
+        hint: "e.g. editorial, portrait, fashion, events"
       - { name: date, label: Date, widget: datetime, required: false }
       - { name: coverPhoto, label: Cover Photo, widget: image }
       - name: imageUrls
