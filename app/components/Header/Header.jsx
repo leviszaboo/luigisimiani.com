@@ -7,6 +7,7 @@ import { cn } from "@/app/lib/cn";
 import { usePathname } from "next/navigation";
 import { useMenuStore } from "@/app/context/UIContext";
 import Link from "next/link";
+import Image from "next/image";
 import MenuButton from "../Menu/MenuButton/MenuButton";
 
 export default function Header() {
@@ -24,31 +25,32 @@ export default function Header() {
     <>
       <MenuButton />
       <motion.header
-        className="fixed h-22 w-screen z-[10000] flex"
+        className="fixed h-22 w-screen z-[10000]"
         {...headerAnimation}
       >
-        {/* Logo - hidden on mobile when menu is open */}
-        <div className={cn(
-          "flex items-center justify-center mr-auto ml-8 max-md:mr-4 max-md:ml-auto transition-opacity duration-300",
-          isMenuVisible && "max-md:opacity-0 max-md:pointer-events-none"
-        )}>
-          <Link href="/" className="block">
-            {/* Plain <img>: vinext routes next/image through a 302 redirect
-              (no local optimization) which renders as a broken icon on
-              first paint. Logo is 22KB — no optimization needed. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo.png"
-              alt="Luigi Simiani"
-              width={120}
-              height={40}
-              className="h-8 w-auto brightness-0 invert opacity-90 hover:opacity-100 transition-opacity"
-            />
-          </Link>
-        </div>
+        {/* Match the page-container bounds used elsewhere (max-w-7xl +
+          px-4 md:px-8) so the logo/nav sit on the same left/right edges
+          as Back button, gallery grid, etc. */}
+        <div className="max-w-7xl mx-auto h-full px-4 md:px-8 flex items-center">
+          {/* Logo - hidden on mobile when menu is open */}
+          <div className={cn(
+            "flex items-center justify-center mr-auto max-md:mr-4 max-md:ml-auto transition-opacity duration-300",
+            isMenuVisible && "max-md:opacity-0 max-md:pointer-events-none"
+          )}>
+            <Link href="/" className="block">
+              <Image
+                src="/logo.png"
+                alt="Luigi Simiani"
+                width={120}
+                height={40}
+                className="h-8 w-auto brightness-0 invert opacity-90 hover:opacity-100 transition-opacity"
+                priority
+              />
+            </Link>
+          </div>
 
-        {/* Navigation */}
-        <nav className="mr-8 gap-4 ml-auto flex items-center justify-center max-md:hidden">
+          {/* Navigation */}
+          <nav className="gap-4 ml-auto flex items-center justify-center max-md:hidden">
           <h2>
             <Link
               href="/gallery"
@@ -82,7 +84,8 @@ export default function Header() {
               CONTACT
             </Link>
           </h2>
-        </nav>
+          </nav>
+        </div>
       </motion.header>
     </>
   );

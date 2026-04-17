@@ -38,3 +38,6 @@ next-env.d.ts
 # Cloudflare / OpenNext
 .open-next/
 .wrangler/
+
+# vinext build output (cherry-picked branch artefacts)
+/dist/
