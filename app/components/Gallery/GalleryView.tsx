@@ -11,16 +11,32 @@ import type { Gallery } from "@/app/types/content";
 interface GalleryViewProps {
   gallery: Gallery;
   isDownloadable?: boolean;
+  initialPhotoIndex?: number;
 }
 
 export default function GalleryView({
   gallery,
   isDownloadable = false,
+  initialPhotoIndex,
 }: GalleryViewProps) {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(
+    typeof initialPhotoIndex === "number" ? initialPhotoIndex : null
+  );
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const { isMenuVisible } = useMenuStore();
+
+  useEffect(() => {
+    if (selectedIndex === null) {
+      window.history.replaceState(null, "", `/gallery/${gallery.id}`);
+    } else {
+      window.history.replaceState(
+        null,
+        "",
+        `/gallery/${gallery.id}/${selectedIndex + 1}`
+      );
+    }
+  }, [selectedIndex, gallery.id]);
 
   const openLightbox = (index: number) => setSelectedIndex(index);
   const closeLightbox = () => setSelectedIndex(null);
@@ -197,7 +213,7 @@ export default function GalleryView({
                 </button>
 
                 {/* Main image area */}
-                <div className="flex-1 flex items-center justify-center px-16 py-4">
+                <div className="relative flex-1 min-h-0 flex items-center justify-center px-4 md:px-20 py-2">
                   {/* Previous button */}
                   <button
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-6xl hover:text-white/70 z-20 w-12 h-12 flex items-center justify-center"
@@ -210,16 +226,16 @@ export default function GalleryView({
                   </button>
 
                   {/* Image container */}
-                  <div className="relative w-full h-full max-w-6xl pointer-events-none">
-                    <Image
-                      src={gallery.imageUrls[selectedIndex]}
-                      alt={`${gallery.title} - Image ${selectedIndex + 1}`}
-                      fill
-                      sizes="100vw"
-                      className="object-contain"
-                      priority
-                    />
-                  </div>
+                  <Image
+                    key={selectedIndex}
+                    src={gallery.imageUrls[selectedIndex]}
+                    alt={`${gallery.title} - Image ${selectedIndex + 1}`}
+                    width={3000}
+                    height={3000}
+                    sizes="100vw"
+                    className="max-w-full max-h-full w-auto h-auto object-contain pointer-events-none"
+                    priority
+                  />
 
                   {/* Next button */}
                   <button

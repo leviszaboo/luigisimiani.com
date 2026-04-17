@@ -11,6 +11,7 @@ interface ProtectedGalleryProps {
   isProtected: boolean;
   isDownloadable?: boolean;
   allowBypass?: boolean;
+  initialPhotoIndex?: number;
 }
 
 export default function ProtectedGallery({
@@ -18,6 +19,7 @@ export default function ProtectedGallery({
   isProtected,
   isDownloadable = false,
   allowBypass = true,
+  initialPhotoIndex,
 }: ProtectedGalleryProps) {
   const [unlockedGallery, setUnlockedGallery] = useState<Gallery | null>(
     isProtected ? null : gallery
@@ -49,5 +51,11 @@ export default function ProtectedGallery({
     );
   }
 
-  return <GalleryView gallery={unlockedGallery} isDownloadable={isDownloadable} />;
+  return (
+    <GalleryView
+      gallery={unlockedGallery}
+      isDownloadable={isDownloadable}
+      initialPhotoIndex={initialPhotoIndex}
+    />
+  );
 }
