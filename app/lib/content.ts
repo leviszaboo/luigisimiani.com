@@ -236,9 +236,11 @@ export const fetchFeaturedGalleries = cache(async (): Promise<Gallery[]> => {
 /**
  * Tag-to-layout mapping
  */
+// `featured` is a selection tag (decides membership in the Featured Work
+// section), not a size tag — keeping it here made every featured item full
+// width, collapsing the grid to one column.
 const TAG_TO_SIZE: Record<string, DisplaySize> = {
   hero: "full",
-  featured: "full",
   highlight: "full",
   editorial: "half",
   pair: "half",
