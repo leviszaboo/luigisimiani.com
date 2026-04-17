@@ -18,18 +18,26 @@ function QuoteWord({ children, range, progress, highlight }) {
 
 function QuoteParagraph({ text, highlightWords = [] }) {
   const element = useRef(null);
+  // Progress runs from when the paragraph's top enters the viewport (85%
+  // down) to when its bottom has scrolled past the top third (30% down),
+  // so the reveal keeps pace with normal reading speed instead of
+  // finishing while the lower lines are still offscreen.
   const { scrollYProgress } = useScroll({
     target: element,
-    offset: ["start 0.95", "start 0.1"],
+    offset: ["start 0.85", "end 0.3"],
   });
 
   const words = text.split(" ");
+  const n = words.length;
+  // Each word's reveal window overlaps with the next so the transition
+  // between words cross-fades rather than snaps.
+  const window = 2 / n;
 
   return (
     <p ref={element} className="flex flex-wrap text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-32 lg:mb-[50vh]">
       {words.map((word, i) => {
-        const start = i / words.length;
-        const end = start + 1 / words.length;
+        const start = i / n;
+        const end = Math.min(start + window, 1);
         const isHighlighted = highlightWords.length === 0 || highlightWords.some((hw) => word.includes(hw));
 
         return (

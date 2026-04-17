@@ -114,13 +114,14 @@ export default function GalleryView({
     <AnimatePresence>
       {!isMenuVisible && (
         <motion.div
-          className="min-h-screen p-8"
+          className="min-h-screen px-4 md:px-8 pt-20 pb-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
+          <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <header className="max-w-7xl mx-auto pt-20 pb-8">
+          <header className="pb-8">
             <div className="flex items-center justify-between">
               {/* Back button */}
               <Link
@@ -173,7 +174,7 @@ export default function GalleryView({
           </header>
 
           {/* Image grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
             {gallery.imageUrls.map((url, index) => (
               <motion.div
                 key={index}
@@ -192,6 +193,7 @@ export default function GalleryView({
                 />
               </motion.div>
             ))}
+          </div>
           </div>
 
           {/* Lightbox */}
