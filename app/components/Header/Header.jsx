@@ -25,13 +25,13 @@ export default function Header() {
     <>
       <MenuButton />
       <motion.header
-        className="fixed h-22 w-screen z-[10000]"
+        className="fixed h-22 w-screen z-[10000] px-4 md:px-8"
         {...headerAnimation}
       >
-        {/* Match the page-container bounds used elsewhere (max-w-7xl +
-          px-4 md:px-8) so the logo/nav sit on the same left/right edges
-          as Back button, gallery grid, etc. */}
-        <div className="max-w-7xl mx-auto h-full px-4 md:px-8 flex items-center">
+        {/* Padding sits on the outer element, inner max-w-7xl matches the
+          exact pattern used by /gallery/[id] page so the logo/nav align
+          pixel-perfect with Back / category / grid edges. */}
+        <div className="max-w-7xl mx-auto h-full flex items-center">
           {/* Logo - hidden on mobile when menu is open */}
           <div className={cn(
             "flex items-center justify-center mr-auto max-md:mr-4 max-md:ml-auto transition-opacity duration-300",
