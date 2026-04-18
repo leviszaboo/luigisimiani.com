@@ -10,6 +10,24 @@ backend:
 media_folder: public/images
 public_folder: /images
 
+# Sveltia auto-transforms raster uploads in the browser before committing.
+# Every uploaded jpg/png/avif/gif is re-encoded as quality-82 WebP and
+# max-dimensioned to 2400px — keeps full-bleed hero crops sharp on 4K
+# displays while typically shrinking raw camera JPEGs by 5-10x.
+# See: https://sveltiacms.app/en/docs/media/internal#image-optimization
+media_library:
+  config:
+    max_file_size: 26214400 # 25 MB — refuse the really huge raws
+    slugify_filename: true  # "My Shot (1).JPG" -> "my-shot-1.webp"
+    transformations:
+      raster_image:
+        format: webp
+        quality: 82
+        width: 2400
+        height: 2400
+      svg:
+        optimize: true
+
 site_url: https://luigisimiani.com
 
 collections:
