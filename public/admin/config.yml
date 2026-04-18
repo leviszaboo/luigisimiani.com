@@ -1,14 +1,25 @@
 # yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
 
+# Auth broker: reusing the working worker from leviszaboo's upstream
+# (sveltia-cms-auth.leme.workers.dev was never deployed — "There is
+# nothing here yet"). Sveltia's auth worker is content-agnostic: it
+# brokers the GitHub OAuth handshake and returns a token scoped to the
+# signed-in user's GitHub permissions on whatever `repo` is set below.
 backend:
   name: github
   repo: leme-leme/luigisimiani
   branch: main
-  base_url: https://sveltia-cms-auth.leme.workers.dev
-  auth_endpoint: /
+  base_url: https://sveltia-cms-auth.leviszaboo.workers.dev
 
-media_folder: public/images
-public_folder: /images
+# Enables `npx @sveltia/cms-proxy-server` for local dev without hitting
+# the live GitHub repo on every save.
+local_backend: true
+
+# PR-based content editing instead of direct commits to main.
+publish_mode: editorial_workflow
+
+media_folder: public/images/galleries
+public_folder: /images/galleries
 
 # Sveltia auto-transforms raster uploads in the browser before committing.
 # Every uploaded jpg/png/avif/gif is re-encoded as quality-82 WebP and
