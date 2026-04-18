@@ -66,6 +66,15 @@ export default function GalleryView({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedIndex, goNext, goPrev]);
 
+  useEffect(() => {
+    if (selectedIndex === null) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [selectedIndex]);
+
   const handleDownloadAll = async () => {
     if (isDownloading) return;
 
